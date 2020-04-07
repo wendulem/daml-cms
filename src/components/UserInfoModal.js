@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Header, Icon, Modal, Image, Form, Popup, TextArea } from 'semantic-ui-react'
+import { Button, Header, Icon, Modal, Image, Form, Popup, TextArea, Input } from 'semantic-ui-react'
 import axios from 'axios'
 
 class UserInfoModal extends React.Component {
@@ -52,7 +52,34 @@ class UserInfoModal extends React.Component {
     window.location.reload();
   }
 
+  // Fix this for axios, etc.
+  tempImageUpload = async (e) => {
+    const files = e.target.files
+    const data = new FormData()
+    data.append('file', files[0])
+    data.append('upload_preset', 'damlImages')
+
+    const res = await fetch(
+      'https://api.cloudinary.com/v1_1/dndwfzjzr/image/upload', 
+      {
+        method: 'POST',
+        body: data
+      }
+    ) 
+
+    const file = await res.json()
+    console.log(file);
+    this.setState({photoString: "https://res.cloudinary.com/dndwfzjzr/" + file.public_id});
+  }
+
   
+  /*
+       <Input onChange = {this.handleFile} type="file">
+            Upload Photo
+            <Icon name='cloud upload' />
+          </Input>
+  */
+
   render() {
     return(
       <Modal trigger={this.props.trigger} closeIcon>
@@ -70,7 +97,7 @@ class UserInfoModal extends React.Component {
           
           <br />
 
-          <Button icon style={{display: "block", "margin-left": "auto", "margin-right": "auto"}} labelPosition='left'>
+          <Button icon onClick={this.tempImageUpload} style={{display: "block", "margin-left": "auto", "margin-right": "auto"}} labelPosition='left'>
             Upload Photo
             <Icon name='cloud upload' />
           </Button>
