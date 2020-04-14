@@ -3,23 +3,23 @@ import {
   Button,
   Icon,
   Table,
-  Header,
   Pagination,
   Input,
+  Modal
 } from "semantic-ui-react";
 import axios from "axios";
-import UserInfoModal from "./UserInfoModal";
+//import UserInfoModal from "./ProjectInfoModal";
 
 // Why did I make this a class?
-class MemberTable extends React.Component {
+class ProjectTable extends React.Component {
   state = {
     activePage: 1,
-    memberTotal: this.props.memberList.length,
+    projectTotal: this.props.projectList.length,
     adding: false,
-    name: null,
-    netID: null,
-    school: null,
-    major: null,
+    title: '',
+    team: '',
+    email: '',
+    imageLink: ''
   };
 
   toggleAdding = () => {
@@ -28,27 +28,18 @@ class MemberTable extends React.Component {
     );
   };
 
-  addUser = async () => {
+  addPaper = async () => {
     var mem = {
-      firstName: this.state.name.substring(0, this.state.name.indexOf(" ")),
-      lastName: this.state.name.substring(
-        this.state.name.indexOf(" ") + 1,
-        this.state.name.length
-      ),
-      netID: this.state.netID,
-      password: "",
-      team: "",
-      major: this.state.major,
-      biography: "",
-      graduationYear: "",
-      school: this.state.school,
-      githubLink: "",
-      linkedIn: "",
-      photoString: "",
+        title: this.state.title, 
+        description: '', 
+        submitter: this.state.team,
+        submitterEmail: this.state.email,
+        imageLink: '',
+        abstract: ''
     };
 
     let response = await axios.post(
-      "https://dukeappml.herokuapp.com//user/new",
+      "https://dukeappml.herokuapp.com/project/new",
       mem
     );
     console.log(response);
@@ -69,7 +60,7 @@ class MemberTable extends React.Component {
             labelPosition="left"
             size="small"
             color="green"
-            onClick={this.addUser}
+            onClick={this.addPaper}
           >
             <Icon name="save" />
             Save Changes
@@ -114,40 +105,30 @@ class MemberTable extends React.Component {
           <Table.Cell>
             <Input
               size="mini"
-              name="name"
+              name="title"
               onChange={this.handleChange}
               focus
-              placeholder="Full Name"
+              placeholder="Title"
             />
           </Table.Cell>
 
           <Table.Cell>
             <Input
               size="mini"
-              name="netID"
+              name="team"
               onChange={this.handleChange}
               focus
-              placeholder="NetID"
+              placeholder="Team"
             />
           </Table.Cell>
 
           <Table.Cell>
             <Input
               size="mini"
-              name="school"
+              name="email"
               onChange={this.handleChange}
               focus
-              placeholder="School"
-            />
-          </Table.Cell>
-
-          <Table.Cell>
-            <Input
-              size="mini"
-              name="major"
-              onChange={this.handleChange}
-              focus
-              placeholder="Discipline"
+              placeholder="Email"
             />
           </Table.Cell>
         </Table.Row>
@@ -158,7 +139,7 @@ class MemberTable extends React.Component {
   handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 
   rowCreation = () =>
-    this.props.memberList.map((member) => {
+    this.props.projectList.map((project) => {
       // is there a way to map the object to the cells faster?
       // iterate through object
       // HOW TO PUT THIS AS THE LAST ROW EVEN WHEN NULL
@@ -181,33 +162,22 @@ class MemberTable extends React.Component {
         */
 
       return (
-        <UserInfoModal
+        <Modal
           trigger={
-            <Table.Row key={member.uid}>
+            <Table.Row key={project.uid}>
               <Table.Cell>
-                {member.firstName} {member.lastName}
+                {project.title}
               </Table.Cell>
               <Table.Cell>
-                {member.netID ? member.netID : "Please fill, no information"}
-              </Table.Cell>
-
-              <Table.Cell>
-                {member.school ? (
-                  member.school
-                ) : (
-                  <Header as="h5" color="red">
-                    <Icon name="arrow circle up" />
-                    <Header.Content>
-                      Please Update: No information
-                    </Header.Content>
-                  </Header>
-                )}
+                {project.submitter}
               </Table.Cell>
 
-              <Table.Cell>{member.major}</Table.Cell>
+              <Table.Cell>
+                {project.submitterEmail}
+              </Table.Cell>
             </Table.Row>
           }
-          userInfo={member}
+          projectInfo={project}
         />
       );
     });
@@ -220,10 +190,9 @@ class MemberTable extends React.Component {
       <Table celled fixed selectable>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell width={5}>Name</Table.HeaderCell>
-            <Table.HeaderCell width={5}>NetID</Table.HeaderCell>
-            <Table.HeaderCell width={5}>School</Table.HeaderCell>
-            <Table.HeaderCell width={5}>Discipline</Table.HeaderCell>
+            <Table.HeaderCell width={7}>Title</Table.HeaderCell>
+            <Table.HeaderCell width={7}>Team</Table.HeaderCell>
+            <Table.HeaderCell width={7}>Email</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
@@ -246,7 +215,7 @@ class MemberTable extends React.Component {
                 firstItem={null}
                 lastItem={null}
                 siblingRange={1}
-                totalPages={Math.ceil(this.props.memberList.length / 10)}
+                totalPages={Math.ceil(this.props.projectList.length / 10)}
                 floated="right"
                 onPageChange={this.handlePaginationChange}
               />
@@ -258,4 +227,4 @@ class MemberTable extends React.Component {
   }
 }
 
-export default MemberTable;
+export default ProjectTable;

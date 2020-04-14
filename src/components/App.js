@@ -1,37 +1,69 @@
 import React from "react";
-import { Segment, Header, Checkbox } from "semantic-ui-react";
 import axios from "axios";
-import MemberTable from "./MemberTable";
-import TileMemberTable from "./TileMemberTable";
-import SidebarMenu from "./SidebarMenu";
+import { Menu, Icon, Sidebar } from "semantic-ui-react";
 import WebpageHeader from "./WebpageHeader";
+import MemberView from "./MemberView";
+import ProjectView from "./ProjectView";
+
 
 class App extends React.Component {
-  state = { 
-    members: [], 
-    suirChecked: false // why is it named this?
+  state = {
+    activeView: 'members', 
+    members: [],
+    projects: [],
+    papers: []     
   }; // or should this object be seperated out into seperate lists
 
   componentDidMount() {
-    this.getMemberData();
-    console.log(this.state.members)
+    this.getData();
   }
 
-  getMemberData = async () => {
-    const response = await axios.get('https://dukeappml.herokuapp.com/users')
-    this.setState({ members: response.data });
+  getData = async () => {
+    const members = await axios.get('https://dukeappml.herokuapp.com/users')
+    this.setState({ members: members.data });
+
+    const projects = await axios.get('https://dukeappml.herokuapp.com/projects')
+    this.setState({ projects: projects.data });
+
+    const papers = await axios.get('https://dukeappml.herokuapp.com/papers')
+    this.setState({ papers: papers.data });
+
+    const news = await axios.get('https://dukeappml.herokuapp.com/newsentries')
+    this.setState({ papers: news.data });
   }
 
-  memberDisplay = () => {
-    if(this.state.suirChecked){
-      return <TileMemberTable memberList={this.state.members}/>;
+  members = () => {
+    this.setState({
+      activeView: 'members'
+    });
+  }
+
+  projects = () => {
+    this.setState({
+      activeView: 'projects'
+    });
+  }
+
+  papers = () => {
+    this.setState({
+      activeView: 'papers'
+    });
+  }
+
+  news = () => {
+    this.setState({
+      activeView: 'news'
+    });
+  }
+
+  setView = () => {
+    console.log(this.state.activeView)
+    if (this.state.activeView === 'projects') {
+      return <ProjectView projects={this.state.projects} />
     }
-    return <MemberTable memberList={this.state.members} />;
+    
+    return <MemberView members={this.state.members} />
   }
-
-  // Why outside the render and not a const inside?
-  toggle = () =>
-    this.setState(({ suirChecked }) => ({ suirChecked: !suirChecked })) //what does this mean - need explained
   
   render() {
     // Shift div styling to css and shift to components
@@ -41,34 +73,35 @@ class App extends React.Component {
 
         <WebpageHeader />
 
-        <SidebarMenu />        
+        <Sidebar
+          as={Menu}
+          animation="overlay"
+          icon="labeled"
+          vertical
+          visible
+          color="#1E2C3A"
+          style={{ position: "absolute", top: "120px"}}
+          width="thin"
+        >
+          <Menu.Item onClick={this.members} as="a">
+            <Icon name="user outline" />
+            Members
+          </Menu.Item>
+          <Menu.Item onClick={this.projects} as="a">
+            <Icon name="folder open outline" />
+            Projects
+          </Menu.Item>
+          <Menu.Item onClick={this.papers} as="a">
+            <Icon name="file alternate outline" />
+            Papers
+          </Menu.Item>
+          <Menu.Item onClick={this.news} as="a">
+            <Icon name="newspaper outline" />
+            News
+          </Menu.Item>
+        </Sidebar>      
 
-        <div className="pageContentTEMP">
-          <Checkbox onChange={this.toggle} label="Tile Mode" toggle style={{float: "right", "padding-right": "150px", "padding-top": '40px'}} />
-          <Header
-              style={{
-                  "padding-left": "175px",
-                  "padding-top": "20px",
-                  color: "#1E2C3A",
-              }}
-              as="h2"
-              icon="user"
-              content="Members"
-          />
-
-          <div
-            style={{
-              "padding-top": "30px",
-              "padding-right": "10px",
-              "padding-left": "165px",
-            }}
-          >
-            <Segment padded="very" className="focus-segment">
-              {this.memberDisplay()}
-            </Segment>
-          </div>
-        </div>
-
+        {this.setView()}
 
       </div>
     );
