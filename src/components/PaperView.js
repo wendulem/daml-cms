@@ -1,53 +1,37 @@
 import React from "react";
 import { Segment, Header, Checkbox } from "semantic-ui-react";
 import TableTemplate from "./TableTemplate";
-import TileMemberTable from "./TileMemberTable";
+//import TileMemberTable from "./TileMemberTable";
 
-class MemberView extends React.Component {
+class PaperView extends React.Component {
   state = {
     suirChecked: false, // why is it named this?
   }; // or should this object be seperated out into seperate lists
 
-  memberDisplay = () => {
+  paperDisplay = () => {
     if (this.state.suirChecked) {
-      return <TileMemberTable memberList={this.props.memberList} />;
+      //return <TileMemberTable memberList={this.props.memberList} />;
     }
     return (
       <TableTemplate
-        itemList={this.props.members}
-        // reduce these two one object maybe?
+        itemList={this.props.papers}
         addObject={{
-          firstName: "",
-          lastName: "",
-          netID: "",
-          school: "",
-          major: "",
-          password: "",
-          team: "",
-          biography: "",
-          graduationYear: "",
-          githubLink: "",
-          linkedIn: "",
-          photoString: "",
+          title: "",
+          subtitle: "",
+          publicationDate: "",
+          creationTime: "",
+          description: "",
+          body: "",
+          authorFirstName: "",
+          authorLastName: "",
+          imageLink: "",
         }}
         tableColumns={{
-          name: "",
-          netID: "",
-          school: "",
-          major: "",
+          title: "",
+          subtitle: "",
+          publicationDate: "",
         }}
-        modalFields={{
-          firstName: "",
-          lastName: "",
-          netID: "",
-          school: "",
-          major: "",
-          team: "",
-          githubLink: "",
-          linkedIn: "",
-          biography: ""
-        }}
-        endpoint="user"
+        endpoint="paper"
       />
     );
   };
@@ -75,8 +59,8 @@ class MemberView extends React.Component {
             color: "#1E2C3A",
           }}
           as="h2"
-          icon="user"
-          content="Members"
+          icon="file alternate"
+          content="Papers"
         />
 
         <div
@@ -87,7 +71,7 @@ class MemberView extends React.Component {
           }}
         >
           <Segment padded="very" className="focus-segment">
-            {this.memberDisplay()}
+            {this.paperDisplay()}
           </Segment>
         </div>
       </div>
@@ -95,4 +79,4 @@ class MemberView extends React.Component {
   }
 }
 
-export default MemberView;
+export default PaperView;

@@ -4,14 +4,16 @@ import { Menu, Icon, Sidebar } from "semantic-ui-react";
 import WebpageHeader from "./WebpageHeader";
 import MemberView from "./MemberView";
 import ProjectView from "./ProjectView";
-
+import NewsView from "./NewsView";
+import PaperView from "./PaperView";
 
 class App extends React.Component {
   state = {
-    activeView: 'members', 
+    activeView: "members",
     members: [],
     projects: [],
-    papers: []     
+    papers: [],
+    news: []
   }; // or should this object be seperated out into seperate lists
 
   componentDidMount() {
@@ -19,58 +21,65 @@ class App extends React.Component {
   }
 
   getData = async () => {
-    const members = await axios.get('https://dukeappml.herokuapp.com/users')
+    const members = await axios.get("https://dukeappml.herokuapp.com/users");
     this.setState({ members: members.data });
 
-    const projects = await axios.get('https://dukeappml.herokuapp.com/projects')
+    const projects = await axios.get(
+      "https://dukeappml.herokuapp.com/projects"
+    );
     this.setState({ projects: projects.data });
 
-    const papers = await axios.get('https://dukeappml.herokuapp.com/papers')
+    const papers = await axios.get("https://dukeappml.herokuapp.com/papers");
     this.setState({ papers: papers.data });
 
-    const news = await axios.get('https://dukeappml.herokuapp.com/newsentries')
-    this.setState({ papers: news.data });
-  }
+    const news = await axios.get("https://dukeappml.herokuapp.com/newsentries");
+    this.setState({ news: news.data });
+  };
 
   members = () => {
     this.setState({
-      activeView: 'members'
+      activeView: "members",
     });
-  }
+  };
 
   projects = () => {
     this.setState({
-      activeView: 'projects'
+      activeView: "projects",
     });
-  }
+  };
 
   papers = () => {
     this.setState({
-      activeView: 'papers'
+      activeView: "papers",
     });
-  }
+  };
 
   news = () => {
     this.setState({
-      activeView: 'news'
+      activeView: "news",
     });
-  }
+  };
 
   setView = () => {
-    console.log(this.state.activeView)
-    if (this.state.activeView === 'projects') {
-      return <ProjectView projects={this.state.projects} />
+    console.log(this.state.activeView);
+    if (this.state.activeView === "projects") {
+      return <ProjectView projects={this.state.projects} />;
     }
-    
-    return <MemberView members={this.state.members} />
-  }
-  
+    if (this.state.activeView === "papers") {
+      return <PaperView papers={this.state.papers} />;
+    }
+    if (this.state.activeView === "news") {
+      return <NewsView news={this.state.news} />;
+    }
+
+    return <MemberView members={this.state.members} />;
+  };
+
   render() {
     // Shift div styling to css and shift to components
     // <Dimmer active /> dimmer shifts around elements, what's best practice
     return (
       <div>
-
         <WebpageHeader />
 
         <Sidebar
@@ -80,7 +89,7 @@ class App extends React.Component {
           vertical
           visible
           color="#1E2C3A"
-          style={{ position: "absolute", top: "120px"}}
+          style={{ position: "absolute", top: "120px" }}
           width="thin"
         >
           <Menu.Item onClick={this.members} as="a">
@@ -99,10 +108,9 @@ class App extends React.Component {
             <Icon name="newspaper outline" />
             News
           </Menu.Item>
-        </Sidebar>      
+        </Sidebar>
 
         {this.setView()}
-
       </div>
     );
   }

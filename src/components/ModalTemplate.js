@@ -10,31 +10,27 @@ import {
   TextArea,
   Grid,
   Loader,
-  Dropdown
+  Dropdown,
 } from "semantic-ui-react";
 import axios from "axios";
 
 class UserInfoModal extends React.Component {
+  constructor(props) {
+    super(props);
 
-  state = {
-    //uploadStatus: null,
-    //file: null,
-    //fileName: null,
+    let editFields = {};
+    for (const key of this.props.modalFields) {
+      editFields[key] = "";
+    }
+    this.state = {
+        //uploadStatus: null,
+        //file: null,
+        //fileName: null,
 
-    firstName: null,
-    lastName: null,
-    netID: null,
-    password: null,
-    team: null,
-    major: null,
-    biography: null,
-    graduationYear: null,
-    school: null,
-    githubLink: null,
-    linkedIn: null,
-    photoString: null
+        editFields
+    }
   }
-  
+
   checkButtonText = () => {
     if (this.state.uploadStatus === "uploaded") {
       return this.fileName;
@@ -46,15 +42,14 @@ class UserInfoModal extends React.Component {
   };
 
   imageUpload = async () => {
-
     console.log("imageUpload");
-    
+
     this.setState({ uploadStatus: "loading" });
 
     var fd = new FormData();
-    fd.append('file', this.state.file);
-    fd.append('upload_preset', 'owcbovwd');
-    
+    fd.append("file", this.state.file);
+    fd.append("upload_preset", "owcbovwd");
+
     //Why doesn't any of this work...
 
     /*const res = await fetch(
@@ -68,31 +63,30 @@ class UserInfoModal extends React.Component {
     const file = await res.json()
 
     console.log(file.secure_url)*/
-    
 
     axios({
-      url:'https://api.cloudinary.com/v1_1/dfitae3co/upload',
-      method: 'POST',
+      url: "https://api.cloudinary.com/v1_1/dfitae3co/upload",
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      data: fd
-    }).then( (res) => {
-      console.log(res)
-    }).catch( (err) => {
-      console.error(err)
+      data: fd,
     })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   handleInfoChange = (e, { name, value }) => {
-    console.log(name)
-    console.log(value)
-    this.setState({ [name]: value });
-  }
+    var stateCopy = Object.assign({}, this.state);
+    stateCopy.editFields[name].upVotes = value;
+    this.setState(stateCopy);
+  };
 
-  handleFileSubmit = () => {
-    //const { firstName, lastName } = this.state
-    //this.setState({ submittedFirstName: firstName, submittedLastName: lastName }, () => console.log(this.state.submittedFirstName))
+  handleFormSubmit = () => {
     this.editMember();
   };
 
@@ -118,19 +112,49 @@ class UserInfoModal extends React.Component {
 
     // This needs to change to not be hardcoded
     var mem = {
-      firstName: this.state.firstName != null ? this.state.firstName : this.props.itemList.firstName,
-      lastName: this.state.lastName != null ? this.state.lastName : this.props.itemList.lastName,
-      netID: this.state.netID != null ? this.state.netID : this.props.itemList.netID,
-      password: this.state.password != null ? this.state.password : this.props.itemList.password,
-      team: this.state.team != null ? this.state.team : this.props.itemList.team,
-      major: this.state.major != null ? this.state.major : this.props.itemList.major,
-      biography: this.state.biography != null ? this.state.biography : this.props.itemList.biography,
-      graduationYear: this.state.graduationYear != null ? this.state.graduationYear : this.props.itemList.graduationYear,
-      school: this.state.school != null ? this.state.school : this.props.itemList.school,
-      githubLink: this.state.githubLink != null ? this.state.githubLink : this.props.itemList.githubLink,
-      linkedIn: this.state.linkedIn != null ? this.state.linkedIn : this.props.itemList.linkedIn,
-      photoString: this.state.photoString != null ? this.state.photoString : this.props.itemList.photoString
-    }
+      firstName:
+        this.state.firstName != null
+          ? this.state.firstName
+          : this.props.itemList.firstName,
+      lastName:
+        this.state.lastName != null
+          ? this.state.lastName
+          : this.props.itemList.lastName,
+      netID:
+        this.state.netID != null ? this.state.netID : this.props.itemList.netID,
+      password:
+        this.state.password != null
+          ? this.state.password
+          : this.props.itemList.password,
+      team:
+        this.state.team != null ? this.state.team : this.props.itemList.team,
+      major:
+        this.state.major != null ? this.state.major : this.props.itemList.major,
+      biography:
+        this.state.biography != null
+          ? this.state.biography
+          : this.props.itemList.biography,
+      graduationYear:
+        this.state.graduationYear != null
+          ? this.state.graduationYear
+          : this.props.itemList.graduationYear,
+      school:
+        this.state.school != null
+          ? this.state.school
+          : this.props.itemList.school,
+      githubLink:
+        this.state.githubLink != null
+          ? this.state.githubLink
+          : this.props.itemList.githubLink,
+      linkedIn:
+        this.state.linkedIn != null
+          ? this.state.linkedIn
+          : this.props.itemList.linkedIn,
+      photoString:
+        this.state.photoString != null
+          ? this.state.photoString
+          : this.props.itemList.photoString,
+    };
 
     let URL =
       "https://dukeappml.herokuapp.com//user/" + this.props.itemList.uid;
@@ -152,52 +176,24 @@ class UserInfoModal extends React.Component {
   };
 
   render() {
-    console.log(this.props.itemList.firstName)
-    console.log(this.state.firstName)
-    
-    /*const schoolOpts = [
-      { key: 'trinity', text: 'Trinity College of Arts & Sciences', value: 'Trinity College of Arts & Sciences' },
-      { key: 'law', text: 'School of Law', value: 'School of Law'},
-      { key: 'grad', text: 'Graduate School', value: 'Graduate School' },
-      { key: 'divinity', text: 'Divinity School', value: 'Divinity School' },
-      { key: 'medicine', text: 'School of Medicine', value: 'School of Medicine' },
-      { key: 'nursing', text: 'School of Nursing', value: 'School of Nursing' },
-      { key: 'fuqua', text: 'Fuqua School of Business', value: 'Fuqua School of Business' },
-      { key: 'pratt', text: 'Pratt School of Engineering', value: 'Pratt School of Engineering' },
-      { key: 'nicholas', text: 'Nicholas School of the Environment', value: 'Nicholas School of the Environment' },
-      { key: 'sanford', text: 'Sanford School of Public Policy', value: 'Sanford School of Public Policy' }
-    ]
-
-    <Dropdown
-                placeholder='School'
-                defaultValue={ schoolOpts[0] }
-                name="school"
-                onChange={this.handleInfoChange}
-                fluid
-                multiple
-                search
-                selection
-                options={schoolOpts}
-              />*/
-    
-    //const major = this.props.itemList.major.trim().split(",")
-    //const majorFixed = array1.map(x => x * 2);
-
-    //console.log(major)
-
     const teamOps = [
-      { key: 'DS', text: 'Data Science', value: 'DS' },
-      { key: 'CRM', text: 'Business Team', value: 'CRM'},
-      { key: 'PS', text: 'Implementation Team', value: 'PS'}
-    ]
-    
+      { key: "DS", text: "Data Science", value: "DS" },
+      { key: "CRM", text: "Business Team", value: "CRM" },
+      { key: "PS", text: "Implementation Team", value: "PS" },
+    ];
+
     return (
       // Why can't the photostring be state based?
       <Modal trigger={this.props.trigger} closeIcon>
         <Header icon="user circle" content="Detailed User View" />
 
         <Modal.Content>
-          <Image wrapped size="medium" centered src={this.props.itemList.photoString} />
+          <Image
+            wrapped
+            size="medium"
+            centered
+            src={this.props.itemList.photoString}
+          />
 
           <br />
 
@@ -211,7 +207,13 @@ class UserInfoModal extends React.Component {
 
           <Grid>
             <Grid.Column textAlign="center">
-              <Button disabled icon as="label" htmlFor="file" labelPosition="left">
+              <Button
+                disabled
+                icon
+                as="label"
+                htmlFor="file"
+                labelPosition="left"
+              >
                 {this.checkButtonText()}
                 <Icon name="cloud upload" />
               </Button>
@@ -261,11 +263,11 @@ class UserInfoModal extends React.Component {
               />
             </Form.Field>
 
-            <Form.Field name='team'>
+            <Form.Field name="team">
               <label>Team</label>
               <Dropdown
-                placeholder='Team'
-                name='team'
+                placeholder="Team"
+                name="team"
                 defaultValue={this.props.itemList.team}
                 onChange={this.handleInfoChange}
                 fluid
@@ -289,7 +291,11 @@ class UserInfoModal extends React.Component {
               <label>
                 LinkedIn{" "}
                 <a
-                  href={this.state.linkedIn != null ? this.state.linkedIn : this.props.itemList.linkedIn}
+                  href={
+                    this.state.linkedIn != null
+                      ? this.state.linkedIn
+                      : this.props.itemList.linkedIn
+                  }
                   rel="noreferrer noopener"
                   target="_blank"
                 >
@@ -308,7 +314,11 @@ class UserInfoModal extends React.Component {
               <label>
                 GitHub{" "}
                 <a
-                  href={this.state.githubLink != null ? this.state.githubLink : this.props.itemList.githubLink}
+                  href={
+                    this.state.githubLink != null
+                      ? this.state.githubLink
+                      : this.props.itemList.githubLink
+                  }
                   rel="noreferrer noopener"
                   target="_blank"
                 >
@@ -333,7 +343,7 @@ class UserInfoModal extends React.Component {
         </Modal.Content>
 
         <Modal.Actions>
-          <Button onClick={this.handleFileSubmit} color="green">
+          <Button onClick={this.handleFormSubmit} color="green">
             <Icon name="save" /> Save Changes
           </Button>
 
