@@ -1,6 +1,7 @@
 import React from "react";
 import { Segment, Header, Checkbox } from "semantic-ui-react";
 import TableTemplate from "./TableTemplate";
+import TileTableTemplate from "./TileTableTemplate";
 
 class ProjectView extends React.Component {
   state = {
@@ -9,7 +10,46 @@ class ProjectView extends React.Component {
 
   projectDisplay = () => {
     if (this.state.suirChecked) {
-      //return <TileProjectTable projectList={this.props.projects}/>;
+      return (
+        <TileTableTemplate
+          itemList={this.props.projects}
+          addObject={{
+            title: "",
+            description: "",
+            submitter: "",
+            submitterEmail: "",
+            approvalStatus: false,
+            creationTime: "",
+            abstract: "",
+            imageLink: "",
+          }}
+          tableColumns={{
+            title: "",
+            description: "",
+            submitter: "",
+            submitterEmail: "",
+          }}
+          modalFields={{
+            title: {
+              format: "textField",
+              ops: null,
+            },
+            description: {
+              format: "textArea",
+              ops: null,
+            },
+            submitter: {
+              format: "textField",
+              ops: null,
+            },
+            abstract: {
+              format: "textField",
+              ops: null,
+            },
+          }}
+          endpoint="project"
+        />
+      );
     }
     console.log(this.props.projects);
     return (
@@ -23,7 +63,7 @@ class ProjectView extends React.Component {
           approvalStatus: false,
           creationTime: "",
           abstract: "",
-          imageLink: ""
+          imageLink: "",
         }}
         tableColumns={{
           title: "",
@@ -31,7 +71,25 @@ class ProjectView extends React.Component {
           submitter: "",
           submitterEmail: "",
         }}
-        view="project"
+        modalFields={{
+          title: {
+            format: "textField",
+            ops: null,
+          },
+          description: {
+            format: "textArea",
+            ops: null,
+          },
+          submitter: {
+            format: "textField",
+            ops: null,
+          },
+          abstract: {
+            format: "textField",
+            ops: null,
+          },
+        }}
+        endpoint="project"
       />
     );
   };

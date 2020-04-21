@@ -8,16 +8,23 @@ import {
   Input,
 } from "semantic-ui-react";
 import axios from "axios";
-import UserInfoModal from "./UserInfoModal";
+import { startCase} from "lodash";
+import ModalTemplate from "./ModalTemplate";
 
 // Why did I make this a class?
 class TableTemplate extends React.Component {
   constructor(props) {
     super(props);
+
+    let addingInput = {};
+    for (const key in this.props.tableColumns) {
+      addingInput[key] = "";
+    }
+
     this.state = {
       activePage: 1,
       adding: false,
-      addingInput: this.props.tableColumns,
+      addingInput,
     };
   }
 
@@ -25,7 +32,12 @@ class TableTemplate extends React.Component {
     this.setState({ adding: !this.state.adding });
   };
 
-  handleChange = (e, { name, value }) => this.setState({ [name]: value });
+  handleChange = (e, { name, value }) => {
+    var stateCopy = Object.assign({}, this.state);
+    stateCopy.addingInput[name] = value;
+    console.log(stateCopy);
+    this.setState(stateCopy);
+  };
 
   handlePaginationChange = (e, { activePage }) => this.setState({ activePage });
 
@@ -43,7 +55,7 @@ class TableTemplate extends React.Component {
         mem[key] = this.state.addingInput[key];
       }
     }
-
+    console.log(mem);
     let response = await axios.post(
       "https://dukeappml.herokuapp.com//" + this.props.endpoint + "/new",
       mem
@@ -61,11 +73,10 @@ class TableTemplate extends React.Component {
       addingCells.push(
         <Table.Cell>
           <Input
-            size="mini"
             name={inputType}
             onChange={this.handleChange}
             focus
-            placeholder={inputType.charAt(0).toUpperCase() + inputType.slice(1)}
+            placeholder={startCase(inputType)}
           />
         </Table.Cell>
       );
@@ -94,7 +105,7 @@ class TableTemplate extends React.Component {
       } else {
         rowCells.push(
           <Table.Cell>
-            {item[key] && 0 != item[key].length ? (
+            {item[key] && 0 !== item[key].length ? (
               item[key]
             ) : (
               <Header as="h5" color="red">
@@ -116,7 +127,7 @@ class TableTemplate extends React.Component {
     for (const key in this.props.tableColumns) {
       headerCells.push(
         <Table.HeaderCell width={columnWidth}>
-          {key.charAt(0).toUpperCase() + key.slice(1)}
+          {startCase(key)}
         </Table.HeaderCell>
       );
     }
@@ -127,12 +138,13 @@ class TableTemplate extends React.Component {
   rowCreation = () =>
     this.props.itemList.map((item) => {
       return (
-        <UserInfoModal
+        <ModalTemplate
           trigger={
             <Table.Row key={item.uid}>{this.contentCells(item)}</Table.Row>
           }
           modalFields={this.props.modalFields}
-          itemList={this.props.itemList}
+          item={item}
+          endpoint={this.props.endpoint}
         />
       );
     });

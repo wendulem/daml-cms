@@ -7,11 +7,11 @@ import {
   Image,
   Form,
   Popup,
-  TextArea,
   Grid,
   Loader,
   Dropdown,
 } from "semantic-ui-react";
+import { startCase, upperFirst } from "lodash";
 import axios from "axios";
 
 class UserInfoModal extends React.Component {
@@ -19,26 +19,28 @@ class UserInfoModal extends React.Component {
     super(props);
 
     let editFields = {};
-    for (const key of this.props.modalFields) {
+    for (const key in this.props.modalFields) {
       editFields[key] = "";
     }
     this.state = {
-        //uploadStatus: null,
-        //file: null,
-        //fileName: null,
+      uploadStatus: null,
+      file: null,
+      fileName: null,
 
-        editFields
-    }
+      editFields,
+    };
   }
 
-  checkButtonText = () => {
-    if (this.state.uploadStatus === "uploaded") {
-      return this.fileName;
-    }
-    if (this.state.uploadStatus === "loading") {
-      return <Loader content="Loading" />;
-    }
-    return "Upload Photo";
+  handleInfoChange = (e, { name, value }) => {
+    var stateCopy = Object.assign({}, this.state);
+    stateCopy.editFields[name] = value;
+    console.log(stateCopy);
+    this.setState(stateCopy);
+  };
+
+  handleFormSubmit = () => {
+    // is there a way to just make this one function
+    this.editItem();
   };
 
   imageUpload = async () => {
@@ -47,8 +49,7 @@ class UserInfoModal extends React.Component {
     this.setState({ uploadStatus: "loading" });
 
     var fd = new FormData();
-    fd.append("file", this.state.file);
-    fd.append("upload_preset", "owcbovwd");
+    fd.append("image", this.state.file);
 
     //Why doesn't any of this work...
 
@@ -65,10 +66,10 @@ class UserInfoModal extends React.Component {
     console.log(file.secure_url)*/
 
     axios({
-      url: "https://api.cloudinary.com/v1_1/dfitae3co/upload",
+      url: "https://api.imgur.com/3/image",
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: "Client-ID 895c6bd0f17127d",
       },
       data: fd,
     })
@@ -78,16 +79,6 @@ class UserInfoModal extends React.Component {
       .catch((err) => {
         console.error(err);
       });
-  };
-
-  handleInfoChange = (e, { name, value }) => {
-    var stateCopy = Object.assign({}, this.state);
-    stateCopy.editFields[name].upVotes = value;
-    this.setState(stateCopy);
-  };
-
-  handleFormSubmit = () => {
-    this.editMember();
   };
 
   fileChange = (e) => {
@@ -106,68 +97,51 @@ class UserInfoModal extends React.Component {
     this.imageUpload();
   };
 
-  editMember = async () => {
+  editItem = async () => {
     //this.setState({buttontext: "Loading..."});
     //let photoLink = await this.imageUpload(event);
 
     // This needs to change to not be hardcoded
-    var mem = {
-      firstName:
-        this.state.firstName != null
-          ? this.state.firstName
-          : this.props.itemList.firstName,
-      lastName:
-        this.state.lastName != null
-          ? this.state.lastName
-          : this.props.itemList.lastName,
-      netID:
-        this.state.netID != null ? this.state.netID : this.props.itemList.netID,
-      password:
-        this.state.password != null
-          ? this.state.password
-          : this.props.itemList.password,
-      team:
-        this.state.team != null ? this.state.team : this.props.itemList.team,
-      major:
-        this.state.major != null ? this.state.major : this.props.itemList.major,
-      biography:
-        this.state.biography != null
-          ? this.state.biography
-          : this.props.itemList.biography,
-      graduationYear:
-        this.state.graduationYear != null
-          ? this.state.graduationYear
-          : this.props.itemList.graduationYear,
-      school:
-        this.state.school != null
-          ? this.state.school
-          : this.props.itemList.school,
-      githubLink:
-        this.state.githubLink != null
-          ? this.state.githubLink
-          : this.props.itemList.githubLink,
-      linkedIn:
-        this.state.linkedIn != null
-          ? this.state.linkedIn
-          : this.props.itemList.linkedIn,
-      photoString:
-        this.state.photoString != null
-          ? this.state.photoString
-          : this.props.itemList.photoString,
-    };
+    var newItem = {};
+    for (const key in this.props.item) {
+      var stateForKey = this.state.editFields[key];
+      newItem[key] =
+        stateForKey && 0 !== stateForKey.length
+          ? stateForKey
+          : this.props.item[key];
+    }
+
+    //get rid of this
+    if (this.props.endpoint === "paper") {
+      Object.defineProperty(
+        newItem,
+        "authorLastName",
+        Object.getOwnPropertyDescriptor(newItem, "authorlastName")
+      );
+      delete newItem["authorlastName"];
+    }
+
+    console.log("Edit Member Item:", newItem);
 
     let URL =
-      "https://dukeappml.herokuapp.com//user/" + this.props.itemList.uid;
+      "https://dukeappml.herokuapp.com//" +
+      this.props.endpoint +
+      "/" +
+      this.props.item.uid;
     console.log(URL);
-    let response = await axios.put(URL, mem);
+    let response = await axios.put(URL, newItem);
     console.log(response);
 
     window.location.reload(); // might just make these exit the modal and reload elsewhere? who knows
   };
 
-  deleteMember = async () => {
+  deleteItem = async () => {
+    // does endpoint translate here? do it w edit user too
     let URL =
-      "https://dukeappml.herokuapp.com//user/" + this.props.itemList.uid;
+      "https://dukeappml.herokuapp.com//" +
+      this.props.endpoint +
+      "/" +
+      this.props.item.uid;
     let response = await axios.delete(URL);
 
     console.log(response);
@@ -175,33 +149,148 @@ class UserInfoModal extends React.Component {
     window.location.reload();
   };
 
-  render() {
-    const teamOps = [
-      { key: "DS", text: "Data Science", value: "DS" },
-      { key: "CRM", text: "Business Team", value: "CRM" },
-      { key: "PS", text: "Implementation Team", value: "PS" },
-    ];
+  checkButtonText = () => {
+    if (this.state.uploadStatus === "uploaded") {
+      return this.fileName;
+    }
+    if (this.state.uploadStatus === "loading") {
+      return <Loader content="Loading" />;
+    }
+    return "Upload Photo";
+  };
 
-    return (
-      // Why can't the photostring be state based?
-      <Modal trigger={this.props.trigger} closeIcon>
-        <Header icon="user circle" content="Detailed User View" />
-
-        <Modal.Content>
+  modalHeader = () => {
+    if (this.props.endpoint === "user") {
+      return (
+        <div>
           <Image
             wrapped
             size="medium"
             centered
-            src={this.props.itemList.photoString}
+            src={this.props.item.photoString}
           />
 
+          <br />
           <br />
 
           <Modal.Description>
             <Header textAlign="center">
-              {this.props.itemList.firstName} {this.props.itemList.lastName}
+              {this.props.item.firstName} {this.props.item.lastName}
             </Header>
           </Modal.Description>
+        </div>
+      );
+    }
+    if (this.props.endpoint === "paper") {
+      return (
+        <Modal.Description>
+          <Header textAlign="center">{this.props.item.title}</Header>
+        </Modal.Description>
+      );
+    }
+
+    return (
+      <div>
+        <Image wrapped size="medium" centered src={this.props.item.imageLink} />
+
+        <br />
+
+        <Modal.Description>
+          <Header textAlign="center">{this.props.item.title}</Header>
+        </Modal.Description>
+      </div>
+    );
+  };
+
+  modalForm = () => {
+    let formFields = [];
+    console.log(this.props.item);
+    // have an else case for text? how does ordering of cases tend to work
+    for (const key in this.props.modalFields) {
+      console.log(key);
+      console.log(this.props.item[key]);
+      if (this.props.modalFields[key].format === "textField") {
+        formFields.push(
+          <Form.Field>
+            <label>{startCase(key)}</label>
+            <Form.Input
+              name={key}
+              onChange={this.handleInfoChange}
+              placeholder={startCase(key)}
+              defaultValue={this.props.item[key]}
+            />
+          </Form.Field>
+        );
+      } else if (this.props.modalFields[key].format === "optionField") {
+        formFields.push(
+          <Form.Field name="team">
+            <label>{startCase(key)}</label>
+            <Dropdown
+              placeholder={startCase(key)}
+              name={key}
+              defaultValue={this.props.item[key]}
+              onChange={this.handleInfoChange}
+              fluid
+              search
+              selection
+              options={this.props.modalFields[key].ops}
+            />
+          </Form.Field>
+        );
+      } else if (this.props.modalFields[key].format === "textArea") {
+        formFields.push(
+          <Form.Field>
+            <label>{startCase(key)}</label>
+            <Form.TextArea
+              placeholder={"Tell us some more..."}
+              name={key}
+              defaultValue={this.props.item[key]}
+              onChange={this.handleInfoChange}
+            ></Form.TextArea>
+          </Form.Field>
+        );
+      } else if (this.props.modalFields[key].format === "linkPreview") {
+        formFields.push(
+          <Form.Field>
+            <label>
+              {upperFirst(key)}{" "}
+              <a
+                href={
+                  this.state.editFields[key] &&
+                  0 !== this.state.editFields[key].length
+                    ? this.state.editFields[key]
+                    : this.props.item[key]
+                }
+                rel="noreferrer noopener"
+                target="_blank"
+              >
+                <Icon name="external alternate" size="small" />
+              </a>{" "}
+            </label>
+            <Form.Input
+              name={key}
+              onChange={this.handleInfoChange}
+              placeholder={upperFirst(key)}
+              defaultValue={this.props.item[key]}
+            />
+          </Form.Field>
+        );
+      }
+    }
+
+    return formFields;
+  };
+
+  render() {
+    return (
+      // Why can't the photostring be state based?
+      <Modal trigger={this.props.trigger} closeIcon>
+        <Header icon="user circle" content="Detailed Edit View" />
+
+        <Modal.Content>
+          <div style={{ padding: "0px", "text-align": "center" }}>
+            {this.modalHeader()}
+          </div>
 
           <br />
 
@@ -221,125 +310,7 @@ class UserInfoModal extends React.Component {
           </Grid>
 
           <input type="file" id="file" hidden onChange={this.fileChange} />
-
-          <Form>
-            <Form.Field>
-              <label>First Name</label>
-              <Form.Input
-                name="firstName"
-                onChange={this.handleInfoChange}
-                placeholder="First name"
-                defaultValue={this.props.itemList.firstName}
-              />
-            </Form.Field>
-
-            <Form.Field>
-              <label>Last Name</label>
-              <Form.Input
-                name="lastName"
-                onChange={this.handleInfoChange}
-                placeholder="Last Name"
-                defaultValue={this.props.itemList.lastName}
-              />
-            </Form.Field>
-
-            <Form.Field>
-              <label>NetID</label>
-              <Form.Input
-                name="netID"
-                onChange={this.handleInfoChange}
-                placeholder="NetID"
-                defaultValue={this.props.itemList.netID}
-              />
-            </Form.Field>
-
-            <Form.Field>
-              <label>School</label>
-              <Form.Input
-                name="school"
-                onChange={this.handleInfoChange}
-                placeholder="School"
-                defaultValue={this.props.itemList.school}
-              />
-            </Form.Field>
-
-            <Form.Field name="team">
-              <label>Team</label>
-              <Dropdown
-                placeholder="Team"
-                name="team"
-                defaultValue={this.props.itemList.team}
-                onChange={this.handleInfoChange}
-                fluid
-                search
-                selection
-                options={teamOps}
-              />
-            </Form.Field>
-
-            <Form.Field>
-              <label>Discipline</label>
-              <Form.Input
-                name="major"
-                onChange={this.handleInfoChange}
-                placeholder="Discipline"
-                defaultValue={this.props.itemList.major}
-              />
-            </Form.Field>
-
-            <Form.Field>
-              <label>
-                LinkedIn{" "}
-                <a
-                  href={
-                    this.state.linkedIn != null
-                      ? this.state.linkedIn
-                      : this.props.itemList.linkedIn
-                  }
-                  rel="noreferrer noopener"
-                  target="_blank"
-                >
-                  <Icon name="external alternate" size="small" />
-                </a>{" "}
-              </label>
-              <Form.Input
-                name="linkedIn"
-                onChange={this.handleInfoChange}
-                placeholder="LinkedIn"
-                defaultValue={this.props.itemList.linkedIn}
-              />
-            </Form.Field>
-
-            <Form.Field>
-              <label>
-                GitHub{" "}
-                <a
-                  href={
-                    this.state.githubLink != null
-                      ? this.state.githubLink
-                      : this.props.itemList.githubLink
-                  }
-                  rel="noreferrer noopener"
-                  target="_blank"
-                >
-                  <Icon name="external alternate" size="small" />
-                </a>{" "}
-              </label>
-              <Form.Input
-                name="githubLink"
-                onChange={this.handleInfoChange}
-                placeholder="GitHub"
-                defaultValue={this.props.itemList.githubLink}
-              />
-            </Form.Field>
-
-            <TextArea
-              name="biography"
-              onChange={this.handleInfoChange}
-              placeholder="Tell us about yourself..."
-              defaultValue={this.props.itemList.biography}
-            />
-          </Form>
+          <Form>{this.modalForm()}</Form>
         </Modal.Content>
 
         <Modal.Actions>
@@ -350,14 +321,14 @@ class UserInfoModal extends React.Component {
           <Popup
             trigger={
               <Button color="red">
-                <Icon name="delete" /> Delete User
+                <Icon name="delete" /> Delete Item
               </Button>
             }
             content={
               <Button
                 color="red"
-                content="Confirm user deletion?"
-                onClick={this.deleteMember}
+                content="Confirm deletion?"
+                onClick={this.deleteItem}
               />
             }
             on="click"

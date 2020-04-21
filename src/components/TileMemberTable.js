@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon, Card, Image, Grid, GridColumn } from "semantic-ui-react";
-import UserInfoModal from "./UserInfoModal";
+import ModalTemplate from "./ModalTemplate";
 
 // Why did I make this a class?
 class TileMemberTable extends React.Component {
@@ -22,7 +22,7 @@ class TileMemberTable extends React.Component {
                 </Card.Content>
 
                 <Card.Content extra>
-                  <UserInfoModal trigger={
+                  <ModalTemplate trigger={
                   <a>
                     <Icon name='edit' />
                     Edit

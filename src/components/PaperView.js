@@ -17,19 +17,39 @@ class PaperView extends React.Component {
         itemList={this.props.papers}
         addObject={{
           title: "",
-          subtitle: "",
-          publicationDate: "",
-          creationTime: "",
-          description: "",
-          body: "",
+          abstract: "",
           authorFirstName: "",
           authorLastName: "",
-          imageLink: "",
+          publicationDate: "",
+          doi: "",
+          url: "",
         }}
         tableColumns={{
           title: "",
-          subtitle: "",
+          doi: "",
           publicationDate: "",
+        }}
+        modalFields={{
+          title: {
+            format: "textField",
+            ops: null,
+          },
+          publicationDate: {
+            format: "textField",
+            ops: null,
+          },
+          abstract: {
+            format: "textArea",
+            ops: null,
+          },
+          authorFirstName: {
+            format: "textField",
+            ops: null,
+          },
+          authorLastName: {
+            format: "textField",
+            ops: null,
+          },
         }}
         endpoint="paper"
       />

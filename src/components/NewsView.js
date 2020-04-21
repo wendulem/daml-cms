@@ -1,7 +1,7 @@
 import React from "react";
 import { Segment, Header, Checkbox } from "semantic-ui-react";
 import TableTemplate from "./TableTemplate";
-//import TileMemberTable from "./TileMemberTable";
+import TileTableTemplate from "./TileTableTemplate";
 
 class NewsView extends React.Component {
   state = {
@@ -10,7 +10,55 @@ class NewsView extends React.Component {
 
   newsDisplay = () => {
     if (this.state.suirChecked) {
-      //return <TileMemberTable memberList={this.props.memberList} />;
+      return (
+        <TileTableTemplate
+          itemList={this.props.news}
+          addObject={{
+            title: "",
+            subtitle: "",
+            description: "",
+            body: "",
+            authorFirstName: "",
+            authorLastName: "",
+            publicationDate: "",
+            imageLink: "",
+          }}
+          tableColumns={{
+            title: "",
+            subtitle: "",
+            publicationDate: "",
+          }}
+          modalFields={{
+            title: {
+              format: "textField",
+              ops: null,
+            },
+            subtitle: {
+              format: "textField",
+              ops: null,
+            },
+            publicationDate: {
+              format: "textField",
+              ops: null,
+            },
+            description: {
+              format: "textArea",
+              ops: null,
+            },
+            body: {
+              format: "textArea",
+            },
+            authorFirstName: {
+              format: "textField",
+              ops: null,
+            },
+            authorLastName: {
+              format: "textField",
+            },
+          }}
+          endpoint="newsentry"
+        />
+      );
     }
     return (
       <TableTemplate
@@ -18,18 +66,45 @@ class NewsView extends React.Component {
         addObject={{
           title: "",
           subtitle: "",
-          publicationDate: "",
           description: "",
           body: "",
           authorFirstName: "",
           authorLastName: "",
-          creationTime: "",
-          imageLink: ""
+          publicationDate: "",
+          imageLink: "",
         }}
         tableColumns={{
           title: "",
           subtitle: "",
-          publicationDate: ""
+          publicationDate: "",
+        }}
+        modalFields={{
+          title: {
+            format: "textField",
+            ops: null,
+          },
+          subtitle: {
+            format: "textField",
+            ops: null,
+          },
+          publicationDate: {
+            format: "textField",
+            ops: null,
+          },
+          description: {
+            format: "textArea",
+            ops: null,
+          },
+          body: {
+            format: "textArea",
+          },
+          authorFirstName: {
+            format: "textField",
+            ops: null,
+          },
+          authorLastName: {
+            format: "textField",
+          },
         }}
         endpoint="newsentry"
       />
