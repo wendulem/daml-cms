@@ -283,7 +283,6 @@ class UserInfoModal extends React.Component {
 
   render() {
     return (
-      // Why can't the photostring be state based?
       <Modal trigger={this.props.trigger} closeIcon>
         <Header icon="user circle" content="Detailed Edit View" />
 
