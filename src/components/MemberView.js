@@ -14,7 +14,6 @@ class MemberView extends React.Component {
       return (
         <TileTableTemplate
           itemList={this.props.members}
-          // reduce these two one object maybe?
           addObject={{
             firstName: "",
             lastName: "",
@@ -84,7 +83,6 @@ class MemberView extends React.Component {
     return (
       <TableTemplate
         itemList={this.props.members}
-        // reduce these two one object maybe?
         addObject={{
           firstName: "",
           lastName: "",
